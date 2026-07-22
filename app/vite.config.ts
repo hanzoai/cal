@@ -13,6 +13,7 @@ const stripeReactStub = fileURLToPath(new URL("./src/stripe-react-stub.tsx", imp
 export default defineConfig({
   plugins: [react()],
   resolve: {
+    dedupe: ["dayjs", "react", "react-dom"],
     alias: {
       // Public booking is free; stub Stripe so the optional peer import resolves
       // and the bundle stays self-contained (no external SDK, CSP-clean).

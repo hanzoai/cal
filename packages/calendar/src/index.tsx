@@ -7,6 +7,10 @@
 // backend at /v1/calendar. Cal's look and feel (its Tailwind styling) ships with
 // the atoms and is intentionally preserved — this is Cal's Booker, Hanzo-hosted.
 
+// Side-effect first: extend the shared dayjs with tz/utc before any Booker code
+// runs (the atoms' own extend is tree-shaken away — see dayjs-setup).
+import "./dayjs-setup";
+
 import { CalProvider, Booker as CalBooker } from "@calcom/atoms";
 import type { ComponentProps, ReactNode } from "react";
 
