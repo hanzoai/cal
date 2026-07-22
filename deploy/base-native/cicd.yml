@@ -1,0 +1,81 @@
+name: cicd
+
+# PREPARED, NOT APPLIED — copy to hanzoai/base/.github/workflows/cicd.yml
+# post-red (the red review owns the base working tree right now).
+#
+# This is the base half of the calendar stack: a push→image build for the Go
+# Base binary that carries the /v1/calendar contract, producing
+# ghcr.io/hanzoai/base:cal-<sha> from base's ./Dockerfile.
+#
+# Same invariant as the cal FE: every job pins a self-hosted Hanzo pool
+# (runs-on) — NEVER a GitHub-hosted runner, so zero GHA minutes. Because the
+# git.hanzo.ai forge scans WORKFLOW_DIRS = .hanzo/workflows,.github/workflows,
+# .gitea/workflows, this same .github file also executes natively on the forge.
+#
+# base already ships native CI (release.yaml = goreleaser binary;
+# platform-build.yml = platform-dispatched image). This ADDS an on-push image
+# build for the cal tag; those keep working via the legacy dirs — no flag day.
+
+on:
+  push:
+    branches: [main, feat/calendar-cal-contract]
+    tags: ['v*']
+  pull_request:
+
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image:
+    runs-on: hanzo-build-linux-amd64
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # base Dockerfile runs `git describe --tags` for -X ...Version.
+          fetch-depth: 0
+
+      - name: Resolve short SHA
+        id: sha
+        run: echo "short=$(echo "${GITHUB_SHA}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          provenance: false
+          tags: |
+            ghcr.io/hanzoai/base:cal-${{ steps.sha.outputs.short }}
+          # Private cross-org modules (hanzoai/*, luxfi/*) resolve via authed git
+          # in the builder stage — base's Dockerfile mounts this as secret id
+          # `gh_token`. Same mechanism release.yaml uses; without it the build
+          # fails SECURITY ERROR on force-moved luxfi tags.
+          secrets: |
+            gh_token=${{ secrets.GH_PAT }}
+
+      - name: Report image + deploy note
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          {
+            echo "### base (cal contract) image"
+            echo "Built + pushed \`ghcr.io/hanzoai/base:cal-${{ steps.sha.outputs.short }}\`."
+            echo ""
+            echo "Deploy is a **gated CTO step**: pin this tag on the base App CR"
+            echo "that serves cal.hanzo.ai/v1/calendar. This workflow never deploys."
+          } >> "$GITHUB_STEP_SUMMARY"
