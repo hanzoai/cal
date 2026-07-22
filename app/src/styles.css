@@ -1,0 +1,131 @@
+:root {
+  --bg: #f6f6f8;
+  --card: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --accent: #111827;
+  --on: #047857;
+  --off: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+/* The shell hosts our own light pages (landing, confirmation). The Booker itself
+   ships Cal's Tailwind styling and renders inside its own wrapper. */
+.shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 32px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.card h1 {
+  font-size: 22px;
+  margin: 8px 0 6px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.when {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.loc {
+  font-size: 14px;
+  margin: 4px 0 12px;
+  word-break: break-word;
+}
+
+code {
+  background: #f1f1f4;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.badge-on {
+  background: #ecfdf5;
+  color: var(--on);
+}
+
+.badge-off {
+  background: #fef2f2;
+  color: var(--off);
+}
+
+.cancel {
+  margin-top: 20px;
+  background: transparent;
+  color: var(--off);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancel:hover {
+  border-color: var(--off);
+}
+
+.cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0b0d;
+    --card: #151517;
+    --ink: #f3f4f6;
+    --muted: #9ca3af;
+    --line: #26262b;
+  }
+  code {
+    background: #26262b;
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "hanzo-calendar",
+  "private": true,
+  "description": "cal.hanzo.ai — Cal.com's Booker (debranded as @hanzo/calendar) over the native Hanzo Base /v1/calendar backend.",
+  "scripts": {
+    "build": "pnpm --filter @hanzo/cal-app build",
+    "dev": "pnpm --filter @hanzo/cal-app dev"
+  },
+  "packageManager": "pnpm@9.15.9"
+}

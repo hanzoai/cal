@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book a time · Hanzo</title>
+    <!-- Cal's atoms bundle expects Node-ish globals; shim them before any module
+         runs so the browser build never touches an undefined `process`/`global`. -->
+    <script>
+      window.global = window;
+      window.process = window.process || { env: { NODE_ENV: "production" } };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
