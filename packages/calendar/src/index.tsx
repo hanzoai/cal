@@ -15,10 +15,10 @@ import type { ComponentProps, ReactNode } from "react";
 import "@calcom/atoms/globals.min.css";
 
 /** Default Base backend for the booking API. Override with VITE_CAL_API. */
-export const DEFAULT_CALENDAR_API = "https://cal.hanzo.ai/v1/calendar";
+export const DEFAULT_CALENDAR_API = "https://api.hanzo.ai/v1/calendar";
 
 export type ProviderProps = {
-  /** Base backend booking API, e.g. https://cal.hanzo.ai/v1/calendar */
+  /** Base backend booking API, e.g. https://api.hanzo.ai/v1/calendar */
   apiUrl?: string;
   children: ReactNode;
 };
