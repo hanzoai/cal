@@ -23,7 +23,10 @@ export function Home() {
   return (
     <main className="landing">
       <header className="nav">
-        <span className="brand">Hanzo Calendar</span>
+        <span className="brand">
+          <img className="brand-mark" src="/logo.svg" alt="" width={22} height={22} />
+          Hanzo Calendar
+        </span>
         <a className="nav-cta" href="/hanzo/intro">
           Book a time
         </a>

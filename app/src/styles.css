@@ -8,9 +8,9 @@
   --accent: #ededed;
   --on: #ededed;
   --off: #8a8a8a;
-  --sans: "Geist", "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --sans: "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
-  --mono: "Geist Mono", "Geist Mono Variable", ui-monospace, "SF Mono", Menlo,
+  --mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo,
     Consolas, monospace;
 }
 
@@ -159,6 +159,12 @@ code {
   font-weight: 700;
   font-size: 18px;
   letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand-mark {
+  display: block;
 }
 .nav-cta {
   color: var(--ink);
@@ -267,3 +273,7 @@ code {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* FORCE GEIST — Tamagui/hanzogui set font-family inline, so override it. */
+#root, #root * { font-family: var(--sans) !important; }
+code, .hero-note code, .foot code { font-family: var(--mono) !important; }
