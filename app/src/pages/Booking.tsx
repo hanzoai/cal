@@ -1,4 +1,4 @@
-import { Booker, Provider } from "@hanzo/calendar";
+import { Booker, Provider } from "@hanzo/cal";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { calendarApi } from "../api";

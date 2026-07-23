@@ -29,5 +29,16 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: false,
     chunkSizeWarningLimit: 4000,
+    rollupOptions: {
+      treeshake: {
+        // @calcom/atoms declares sideEffects:false, so the bundler drops its
+        // `import "./vendor/dayjs/index.js"` (which runs dayjs.extend(utc,
+        // timezone, …)). Without it dayjs.tz is undefined and the Booker crashes
+        // at bootstrap on dayjs.tz.guess(). Treat the atoms as side-effectful so
+        // that extend import is preserved; everything else keeps default DCE.
+        moduleSideEffects: (id) =>
+          id.includes("@calcom/atoms") || id.includes("dayjs") ? true : "no-external",
+      },
+    },
   },
 });

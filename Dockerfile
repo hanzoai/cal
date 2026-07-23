@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# cal.hanzo.ai — Cal's <Booker> (debranded as @hanzo/calendar) as a static SPA,
+# cal.hanzo.ai — Cal's <Booker> (debranded as @hanzo/cal) as a static SPA,
 # served by hanzoai/spa (Go static server, :3000). Self-contained multi-stage:
 # stage 1 compiles the Vite bundle with the pinned pnpm; stage 2 serves it. A
 # fresh `docker build .` needs no pre-built dist on the host (app/dist is
@@ -12,10 +12,10 @@ RUN corepack enable
 # Manifests first: the install layer caches independently of source edits.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY app/package.json app/package.json
-COPY packages/calendar/package.json packages/calendar/package.json
+COPY packages/cal/package.json packages/cal/package.json
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
-# Sources, then build → app/dist. @hanzo/calendar is workspace TS source that
+# Sources, then build → app/dist. @hanzo/cal is workspace TS source that
 # Vite transpiles; @calcom/atoms is consumed as its pre-built ESM bundle.
 COPY . .
 RUN pnpm build

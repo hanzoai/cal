@@ -1,11 +1,12 @@
-// @hanzo/calendar — Hanzo-branded booking components.
+// @hanzo/cal — Hanzo-owned booking components.
 //
 // This is the debranded fork surface of Cal.com's @calcom/atoms (MIT — see the
-// NOTICE file). The SPA at cal.hanzo.ai imports ONLY from here, never from
-// @calcom/atoms directly: the Cal provider and Booker are re-exported under Hanzo
-// names and defaulted for public, no-OAuth booking against the native Hanzo Base
-// backend at /v1/calendar. Cal's look and feel (its Tailwind styling) ships with
-// the atoms and is intentionally preserved — this is Cal's Booker, Hanzo-hosted.
+// NOTICE file). Consumers (the SPA at cal.hanzo.ai and any other) import ONLY from
+// here, never from @calcom/atoms directly: the provider and Booker are re-exported
+// under Hanzo names and defaulted for public, no-OAuth booking against the native
+// Hanzo backend at api.hanzo.ai/v1/calendar. Cal's look and feel (its Tailwind
+// styling) ships with the atoms and is intentionally preserved — this is the
+// Booker, Hanzo-owned and Hanzo-hosted.
 
 // Side-effect first: extend the shared dayjs with tz/utc before any Booker code
 // runs (the atoms' own extend is tree-shaken away — see dayjs-setup).
@@ -15,10 +16,11 @@ import { CalProvider, Booker as CalBooker } from "@calcom/atoms";
 import type { ComponentProps, ReactNode } from "react";
 
 // Cal's atom styles (Tailwind, pre-built). Importing here means a consumer only has
-// to import "@hanzo/calendar" to get both the components and their look.
+// to import "@hanzo/cal" to get both the components and their look. Kept as a
+// preserved side effect (package sideEffects: true) so no bundler drops it.
 import "@calcom/atoms/globals.min.css";
 
-/** Default Base backend for the booking API. Override with VITE_CAL_API. */
+/** Default backend for the booking API. Override with VITE_CAL_API. */
 export const DEFAULT_CALENDAR_API = "https://api.hanzo.ai/v1/calendar";
 
 export type ProviderProps = {
