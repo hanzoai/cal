@@ -1,28 +1,21 @@
 name: Platform Build (arcd executor)
 
-# Dispatched by platform.hanzo.ai (NOT by GitHub on push). Platform receives
-# the repo webhook, schedules the build, and triggers this workflow via
-# workflow_dispatch with the inputs below — pinning the arcd runner pool per
-# build target. On completion this workflow calls back into platform, which
-# records the outcome and (on success) rolls the image out via the operator.
-#
-# This is the per-repo half of the platform-native CI/CD escape from GHA as a
-# single point of failure. The build muscle still runs on self-hosted arcd.
+# Native image build on a self-hosted arcd runner. Triggered via workflow_dispatch
+# (by the `hanzo` CLI, a maintainer, or CD) — never by GHA on push, so pushing to
+# GitHub burns zero GHA minutes. It builds and pushes the image to GHCR; rollout is
+# handled separately by the operator via the App CR. The build muscle runs on arcd.
 
 on:
   workflow_dispatch:
     inputs:
-      build-job-id:
-        description: Platform buildJob id (echoed back on completion)
-        required: true
       target:
         description: "Build target, e.g. linux/amd64"
         required: true
       runner-pool:
-        description: "arcd pool label, e.g. hanzoai-linux-amd64"
+        description: "arcd pool label, e.g. hanzo-build-linux-amd64"
         required: true
       image:
-        description: "Fully-resolved image ref, e.g. ghcr.io/hanzoai/zip:<sha>"
+        description: "Fully-resolved image ref, e.g. ghcr.io/hanzoai/cal:v0.2.0"
         required: true
       dockerfile:
         description: Path to the Dockerfile
@@ -71,30 +64,3 @@ jobs:
           # Without it the build fails SECURITY ERROR on force-moved luxfi tags.
           secrets: |
             gh_token=${{ secrets.GH_PAT }}
-
-      - name: Report success to platform
-        if: success()
-        env:
-          TOKEN: ${{ secrets.PLATFORM_BUILD_CALLBACK_TOKEN }}
-        run: |
-          curl -fsS -X POST "https://platform.hanzo.ai/v1/build-callback" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "$(jq -nc \
-              --arg id '${{ inputs.build-job-id }}' \
-              --arg inst '${{ github.event.installation.id }}' \
-              --arg img '${{ inputs.image }}' \
-              '{buildJobId:$id, outcome:"success", installationId:$inst, log:("built "+$img)}')"
-
-      - name: Report failure to platform
-        if: failure()
-        env:
-          TOKEN: ${{ secrets.PLATFORM_BUILD_CALLBACK_TOKEN }}
-        run: |
-          curl -fsS -X POST "https://platform.hanzo.ai/v1/build-callback" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "$(jq -nc \
-              --arg id '${{ inputs.build-job-id }}' \
-              --arg inst '${{ github.event.installation.id }}' \
-              '{buildJobId:$id, outcome:"failure", installationId:$inst, error:"build step failed"}')"
