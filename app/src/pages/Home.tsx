@@ -1,9 +1,5 @@
-// Hanzo Calendar — the marketing landing at cal.hanzo.ai/. Public booking pages
-// live at /{host}/{event}; the hero embeds a live, bookable demo.
-import { CalendarEmbed } from "@hanzo/booker";
-
-import { calendarApi } from "../api";
-
+// Hanzo Calendar — the marketing landing at cal.hanzo.ai/. Pure, always-renders
+// HTML; the "Try a booking" CTA links to the live Booker at /{host}/{event}.
 const FEATURES = [
   {
     title: "Native, not glued together",
@@ -58,11 +54,6 @@ export function Home() {
         </p>
       </section>
 
-      <section className="hero-demo">
-        <div className="demo-card">
-          <CalendarEmbed host="hanzo" eventSlug="intro" apiUrl={calendarApi} />
-        </div>
-      </section>
 
       <section className="features">
         {FEATURES.map((f) => (
