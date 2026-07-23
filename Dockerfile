@@ -13,6 +13,7 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY app/package.json app/package.json
 COPY packages/cal/package.json packages/cal/package.json
+COPY patches patches
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 # Sources, then build → app/dist. @hanzo/cal is workspace TS source that
