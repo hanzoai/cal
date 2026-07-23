@@ -1,5 +1,12 @@
-// Hanzo Calendar — the marketing landing at cal.hanzo.ai/. Pure, always-renders
-// HTML; the "Try a booking" CTA links to the live Booker at /{host}/{event}.
+import { Booker } from "@hanzo/booker";
+import { useNavigate } from "react-router-dom";
+
+import { calendarApi } from "../api";
+
+// hanzo.id is the IAM login. Creating/managing your own calendars is auth-gated,
+// so both "Sign in" and "Create your calendar" enter through it.
+const LOGIN_URL = "https://hanzo.id";
+
 const FEATURES = [
   {
     title: "Native, not glued together",
@@ -19,7 +26,12 @@ const FEATURES = [
   },
 ];
 
+// The landing at cal.hanzo.ai/. The product itself — the live <Booker> — is the
+// hero: pick a time and it books straight into /v1/calendar. Sign-in and calendar
+// creation route through hanzo.id (IAM).
 export function Home() {
+  const navigate = useNavigate();
+
   return (
     <main className="landing">
       <header className="nav">
@@ -27,36 +39,36 @@ export function Home() {
           <img className="brand-mark" src="/logo.svg" alt="" width={22} height={22} />
           Hanzo Calendar
         </span>
-        <a className="nav-cta" href="/hanzo/intro">
-          Book a time
-        </a>
+        <nav className="nav-links">
+          <a className="nav-link" href={LOGIN_URL}>
+            Sign in
+          </a>
+          <a className="nav-cta" href={LOGIN_URL}>
+            Create your calendar
+          </a>
+        </nav>
       </header>
 
       <section className="hero">
-        <h1>Scheduling, the way it should be.</h1>
+        <h1>Scheduling, native to your stack.</h1>
         <p className="lede">
-          Share a link, pick a time, done. Hanzo Calendar is native scheduling
-          on your own infrastructure — connected to the calendars you already
-          use.
-        </p>
-        <div className="hero-actions">
-          <a className="btn btn-primary" href="/hanzo/intro">
-            Try a booking →
-          </a>
-          <a
-            className="btn btn-ghost"
-            href="https://github.com/hanzoai/cal"
-            target="_blank"
-            rel="noreferrer"
-          >
-            View the source
-          </a>
-        </div>
-        <p className="hero-note">
-          Live at <code>cal.hanzo.ai/&#123;host&#125;/&#123;event&#125;</code>
+          Pick a time below — it books straight into Hanzo. Same engine,
+          self-hosted, connected to the calendars you already use.
         </p>
       </section>
 
+      <section className="booker-stage">
+        <div className="booker-frame">
+          <Booker
+            host="hanzo"
+            eventSlug="intro"
+            apiUrl={calendarApi}
+            onBooked={(booking) => {
+              if (booking?.uid) navigate(`/booking/${booking.uid}`);
+            }}
+          />
+        </div>
+      </section>
 
       <section className="features">
         {FEATURES.map((f) => (

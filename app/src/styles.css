@@ -166,21 +166,52 @@ code {
 .brand-mark {
   display: block;
 }
-.nav-cta {
-  color: var(--ink);
+.nav-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+.nav-link {
+  color: var(--muted);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  border: 1px solid var(--line);
+}
+.nav-link:hover {
+  color: var(--ink);
+}
+.nav-cta {
+  color: #0a0a0a;
+  background: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--accent);
   border-radius: 999px;
   padding: 8px 16px;
 }
 .nav-cta:hover {
+  opacity: 0.9;
+}
+
+/* The product itself — the live Booker — framed as the hero centerpiece. */
+.booker-stage {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 56px;
+}
+.booker-frame {
+  width: 100%;
+  max-width: 720px;
   background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  overflow: hidden;
 }
 .hero {
   text-align: center;
-  padding: 48px 0 56px;
+  padding: 44px 0 24px;
 }
 .hero h1 {
   font-size: clamp(32px, 6vw, 56px);
