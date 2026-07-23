@@ -1,11 +1,15 @@
+import { GuiProvider } from "hanzogui";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "./App";
+import { config } from "./gui";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <GuiProvider config={config} defaultTheme="light">
+      <App />
+    </GuiProvider>
   </StrictMode>
 );

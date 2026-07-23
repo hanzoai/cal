@@ -7,9 +7,5 @@
     "dev": "pnpm --filter @hanzo/cal-app dev"
   },
   "packageManager": "pnpm@9.15.9",
-  "pnpm": {
-    "patchedDependencies": {
-      "@calcom/atoms@2.11.0": "patches/@calcom__atoms@2.11.0.patch"
-    }
-  }
+  "pnpm": {}
 }
