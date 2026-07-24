@@ -1,78 +1,13 @@
 name: cicd
-
-# Canonical home = github.com/hanzoai/cal. This SAME file also runs natively on
-# the git.hanzo.ai forge, whose runner scans WORKFLOW_DIRS = .hanzo/workflows,
-# .github/workflows, .gitea/workflows — so no .hanzo/workflows copy is needed:
-# .github/workflows is both GitHub-discoverable AND executed by the Hanzo runner.
-#
-# The invariant that makes this "native, our way" is the COMPUTE, not the folder:
-# every job pins a self-hosted Hanzo pool via `runs-on` — NEVER a GitHub-hosted
-# runner (ubuntu-latest, etc.). Zero GitHub Actions minutes are ever consumed.
-#
-# The SPA bundle is built INSIDE the multi-stage Dockerfile (stage 1, pinned
-# pnpm), so this workflow is one build — checkout + buildx + push. The FE has no
-# private modules (all public npm: @calcom/atoms MIT, react), so no GH_PAT
-# build-secret is needed here, unlike the Go repos.
-
+# NEUTRALIZED — this repo's canonical deploy pipeline is native:
+# .hanzo/workflows/deploy.yml (Hanzo Git push -> act_runner -> BuildKit ->
+# ghcr.io/hanzoai/cal:<sha> -> kubectl patch app cal-web -> operator reconcile).
+# GitHub is a mirror; image build + deploy no longer run here.
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
-
-concurrency:
-  group: cicd-${{ github.ref }}
-  cancel-in-progress: true
-
+  workflow_dispatch:
 jobs:
-  image:
-    # Self-hosted Hanzo pool (arc-system / git.hanzo.ai runner). Same label the
-    # hanzoai/base release job uses. NEVER a GitHub-hosted runner.
-    runs-on: hanzo-build-linux-amd64
-    permissions:
-      contents: read
-      packages: write
+  notice:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Resolve short SHA
-        id: sha
-        run: echo "short=$(echo "${GITHUB_SHA}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
-
-      # GHCR push. On the ARC (GitHub-context) pool the auto GITHUB_TOKEN carries
-      # packages:write. When this file runs on the native git.hanzo.ai gitea
-      # runner, the forge's auto token is scoped to the forge, not ghcr.io — set
-      # a repo/org secret GH_PAT (write:packages) and swap the password below.
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
-          # PRs build (validate the Dockerfile) but do not push; main/tags push.
-          push: ${{ github.event_name != 'pull_request' }}
-          provenance: false
-          tags: |
-            ghcr.io/hanzoai/cal:sha-${{ steps.sha.outputs.short }}
-            ghcr.io/hanzoai/cal:latest
-
-      - name: Report image + deploy note
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          {
-            echo "### cal FE image"
-            echo "Built + pushed \`ghcr.io/hanzoai/cal:sha-${{ steps.sha.outputs.short }}\` on \`${{ runner.name }}\`."
-            echo ""
-            echo "Deploy is a **gated CTO step**: pin this tag on the \`cal\` App CR;"
-            echo "the operator rolls it out. This workflow never deploys."
-          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Native pipeline notice
+        run: echo "native pipeline is .hanzo/workflows/deploy.yml; GitHub is a mirror"
