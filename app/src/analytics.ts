@@ -21,20 +21,34 @@ import type { Target } from "./pk";
 /** Where the booker was presented to the visitor. */
 export type Surface = "page" | "hero" | "inline" | "popup";
 
-// Do-not-track and Global Privacy Control. The SDK reads neither — each surface
-// decides its own consent, and a booker embedded in someone else's page should
-// be the polite one.
+// Every refusal signal a browser can raise, in the spelling hz.js already
+// honors: Global Privacy Control, Do Not Track on navigator (both "1" and the
+// older "yes"), on window, and Microsoft's. The SDK reads none of them — each
+// surface decides its own consent.
+//
+// Framed, the client is off entirely. The id it stamps on an event is the
+// fleet's hz_anon_id, read from a cookie on hanzo.ai that every Hanzo surface
+// shares; reading it inside someone else's page is what would turn a booker
+// into a cross-site tracker, and the events would be attributed to a visitor
+// who came to read that page, not ours. A booker embedded in someone else's
+// page is the polite one.
 function permitted(): boolean {
   if (typeof navigator === "undefined") return false;
-  const n = navigator as Navigator & { globalPrivacyControl?: boolean };
-  return n.doNotTrack !== "1" && n.globalPrivacyControl !== true;
+  const n = navigator as Navigator & { globalPrivacyControl?: boolean; msDoNotTrack?: string };
+  const w = window as Window & { doNotTrack?: string };
+  if (n.globalPrivacyControl === true) return false;
+  if (n.doNotTrack === "1" || n.doNotTrack === "yes") return false;
+  if (w.doNotTrack === "1" || n.msDoNotTrack === "1") return false;
+  return window.parent === window;
 }
 
 export const analytics = createAnalytics({
   product: "cal",
   host: import.meta.env.VITE_EVENT_HOST || "https://api.hanzo.ai",
-  // A pk- ingest key attributes anonymous writes; without one the plane is
-  // inert, which is the intended default for a fork nobody has keyed yet.
+  // A pk- ingest key attributes anonymous writes. Without one the client still
+  // POSTs — it drops the Authorization header, nothing else — so an unkeyed fork
+  // is unattributed at the door, not silent. What keeps it quiet is `enabled`
+  // and the fact that nothing here reports a page it was not asked to.
   ingestKey: import.meta.env.VITE_PUBLISHABLE_KEY || undefined,
   enabled: permitted(),
 });
@@ -59,11 +73,9 @@ export function booked(surface: Surface, t: Target): void {
   analytics.capture(EVENTS.ORDER_COMPLETED, step(surface, t));
 }
 
-/** keyRejected reports a host page carrying a key that names nothing. Not a
- *  funnel step — an integration fault, and the booker renders empty until it is
- *  fixed, so it belongs on the error plane where someone is watching. */
-export function keyRejected(pk: string): void {
-  analytics.captureError(new Error("publishable key names no calendar"), {
-    properties: { pk },
-  });
-}
+// A key that names no calendar reports nothing. captureError was the wrong
+// instrument twice: it put the verbatim ?pk= — a string the caller picks, of no
+// bounded length — into a row on the shared warehouse, and it flushes on the
+// spot, so one load became one POST of a page anyone can load in a loop. A
+// selector that doesn't resolve is a mistyped host page, not a fault: the
+// visitor is told on the page, and the missing pricing_viewed is the signal.
