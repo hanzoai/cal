@@ -130,6 +130,36 @@ code {
   cursor: default;
 }
 
+.confirm {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Keeping the booking is the answer this page prefers, so it looks like one and
+   the destructive answer is the quiet one below it. */
+.keep {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.keep:hover {
+  border-color: var(--ink);
+}
+
+.confirm .cancel {
+  margin-top: 0;
+  border: 0;
+  padding: 4px 8px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0b0b0d;

@@ -46,8 +46,8 @@ URL. It is a public selector, not a credential: it authorizes nothing and grants
 you could not reach by visiting the booking page.
 
 Each booker is an iframe, so a host page's CSS cannot reach it and ours cannot reach
-theirs. Pages that build their DOM after load can call `HanzoCal.mount(el)`,
-`HanzoCal.open(pk)` and `HanzoCal.close()`.
+theirs. The popup opens under a bar naming the site serving it. Pages that build their
+DOM after load can call `HanzoCal.mount(el)`, `HanzoCal.open(pk)` and `HanzoCal.close()`.
 
 ## Layout
 

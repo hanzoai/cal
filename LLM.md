@@ -50,22 +50,41 @@ and cancels the booking, so it never leaves the booking page.
 
 ## The embed
 - `app/src/embed.ts` → built by `app/vite.embed.config.ts` to the fixed URL
-  `/embed.js`, a ~2 kB classic IIFE with no React. It is a SEPARATE vite build
+  `/embed.js`, a ~3 kB classic IIFE with no React. It is a SEPARATE vite build
   that runs after the SPA build with `emptyOutDir:false`; the SPA build must go
   first or it wipes the loader.
-- Every booker is an iframe pointed at `/embed?pk=…&surface=…`, which is what
-  isolates host CSS. The loader's own elements are styled with
+- Every booker is an iframe pointed at `/embed?pk=…&surface=…&parent=…`, which is
+  what isolates host CSS. The loader's own elements are styled with
   `setProperty(…, "important")` over `all:initial` — inline+important is the one
   declaration a host's `iframe { border: … !important }` cannot outrank.
 - An iframe cannot size itself, so `/embed` posts its height on a ResizeObserver
-  and the loader applies it; the same channel carries `close` so Escape pressed
-  INSIDE the frame can dismiss a popup (a keypress in a frame never reaches the
-  page around it). The loader checks `e.origin` and matches `e.source` against
-  the frames it made.
+  and the loader applies it, clamped to 5000px; the same channel carries `close`
+  so Escape pressed INSIDE the frame can dismiss a popup (a keypress in a frame
+  never reaches the page around it). The loader checks `e.origin` AND binds each
+  message to the frame entitled to send it — `height` to the inline frame that
+  reported it, `close` to the open popup. The frame answers only the origin the
+  loader named in `?parent=`, never `*`.
+- The popup carries a bar naming the origin it serves. `data-*` is what survives
+  an HTML sanitizer, so a page that accepts user HTML can be made to open a
+  full-viewport overlay with no script at all; the bar is drawn in the loader's
+  own DOM under `all:initial !important`, which a scriptless injection cannot
+  remove, and it says whose dialog it is.
 - `ALLOW_FRAMING=true` is set in the Dockerfile because `ghcr.io/hanzoai/spa`
   otherwise sends `X-Frame-Options: DENY` + `frame-ancestors 'none'` and the
-  embed silently refuses to render. (That server reads `SPA_CSP`, not the
-  `HANZO_STATIC_CSP` also set there.)
+  embed silently refuses to render. **It also means cal serves no CSP at all.**
+  That server sets the header only on the branch where framing is refused, so
+  with framing allowed the whole policy is dropped on every path — measured
+  against `sha-b9d3a13`: no CSP and no X-Frame-Options on `/` or `/booking/x`.
+  The value is spelled `SPA_CSP`, the name the server actually reads
+  (`HANZO_STATIC_CSP` was read by nothing), and it ships the day that image sets
+  the header unconditionally and lets framing pick `frame-ancestors` instead of
+  picking whether there is a policy at all. `SPA_*` is also the runtime-config
+  namespace there, so the value is additionally templated into a public
+  `/config.json` — public either way, but worth knowing.
+- Framing reaches `/booking/<uid>` too, since the allowance is per-server. The
+  uid is the capability that reads the attendee and cancels the meeting, so
+  cancelling takes two clicks, and `Keep it` is the one that sits where the first
+  click was.
 
 ## The publishable key
 `app/src/pk.ts`. `pk_` + base64url(`<host>/<eventSlug>`) — self-describing, so it
@@ -90,12 +109,24 @@ never a new event name — so the funnel rides the conversion names, qualified b
 - `pricing_viewed {kind, surface, host, eventType}` — the booker reached a visitor
 - `order_completed {kind, surface, host, eventType}` — a booking was created
 - `surface` is `page` | `hero` | `inline` | `popup`
-- a key that names nothing goes to the error plane, not the funnel
+- a key that names nothing reports nothing
 
 Only the two public identifiers ride along; never the booking uid, never the
-attendee. `VITE_PUBLISHABLE_KEY` (a `pk-` ingest key) attributes anonymous
-traffic — without one the plane is inert. DNT and GPC are honoured here because
-the SDK reads neither.
+attendee — and `autoPageview` is OFF in `main.tsx`, because `@hanzo/event` stamps
+`url` and `path` on EVERY event it builds and one route here is `/booking/<uid>`.
+Each surface reports itself by name instead, so nothing is lost.
+
+Framed, the client is off entirely (`permitted()`), so `inline` and `popup` do
+not emit today: the id on an event is the fleet's `hz_anon_id`, a cookie on
+hanzo.ai that every Hanzo surface shares, and minting it inside someone else's
+page is what would make a booker a cross-site tracker. Measuring the embed
+surfaces again takes an embed-scoped id in `@hanzo/event`, not a change here.
+
+`VITE_PUBLISHABLE_KEY` (a `pk-` ingest key) attributes anonymous traffic. Without
+one the client still POSTs — it drops the `Authorization` header and nothing else
+— so an unkeyed fork is unattributed at the door, not silent. DNT (in all four
+spellings a browser uses) and GPC are honoured here because the SDK reads none of
+them.
 
 **Interior steps are not emitted, and cannot be from this repo.** `<Booker>`'s
 only lifecycle prop is `onBooked`; `slot_selected` and `details_entered` live in
