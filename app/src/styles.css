@@ -305,6 +305,38 @@ code {
   gap: 8px;
 }
 
+/* The copy-paste embed snippet under the landing booker. */
+.embed-hint {
+  margin: 0 0 56px;
+  text-align: center;
+}
+.embed-hint .muted {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+.snippet {
+  margin: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  text-align: left;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* Framed in someone else's page: paint no background of our own, and give the
+   booker the whole document. */
+html.framed,
+html.framed body {
+  background: transparent;
+}
+.embed {
+  padding: 0;
+}
+
 /* FORCE GEIST — Tamagui/hanzogui set font-family inline, so override it. */
 #root, #root * { font-family: var(--sans) !important; }
 code, .hero-note code, .foot code { font-family: var(--mono) !important; }

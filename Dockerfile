@@ -31,4 +31,8 @@ ENV ROOT=/public
 # Allow same-origin + inline bootstrap (React hydration) and connect-src https:
 # so the browser can reach the Base booking API at cal.hanzo.ai/v1/calendar.
 ENV HANZO_STATIC_CSP="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src 'self'; media-src 'self' https:"
+# /embed is meant to be framed by other people's pages, which hanzoai/spa
+# otherwise refuses with X-Frame-Options: DENY + frame-ancestors 'none'. Nothing
+# here holds a session or a credential, so there is no clickjacking to steal.
+ENV ALLOW_FRAMING=true
 EXPOSE 3000

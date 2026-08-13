@@ -2,10 +2,16 @@ import { Booker } from "@hanzo/booker";
 import { useNavigate } from "react-router-dom";
 
 import { calendarApi } from "../api";
+import { booked, useShown } from "../analytics";
+import { mint } from "../pk";
 
 // hanzo.id is the IAM login. Creating/managing your own calendars is auth-gated,
 // so both "Sign in" and "Create your calendar" enter through it.
 const LOGIN_URL = "https://hanzo.id";
+
+// The calendar the landing page books into, and the one it hands out an embed
+// key for — the same pair, so the snippet below always matches what is shown.
+const HERO = { host: "hanzo", eventSlug: "intro" };
 
 const FEATURES = [
   {
@@ -31,6 +37,12 @@ const FEATURES = [
 // creation route through hanzo.id (IAM).
 export function Home() {
   const navigate = useNavigate();
+
+  useShown("hero", HERO);
+
+  const snippet =
+    `<div data-hanzo-cal="${mint(HERO)}"></div>\n` +
+    `<script async src="${location.origin}/embed.js"></script>`;
 
   return (
     <main className="landing">
@@ -60,14 +72,22 @@ export function Home() {
       <section className="booker-stage">
         <div className="booker-frame">
           <Booker
-            host="hanzo"
-            eventSlug="intro"
+            host={HERO.host}
+            eventSlug={HERO.eventSlug}
             apiUrl={calendarApi}
             onBooked={(booking) => {
+              booked("hero", HERO);
               if (booking?.uid) navigate(`/booking/${booking.uid}`);
             }}
           />
         </div>
+      </section>
+
+      <section className="embed-hint">
+        <p className="muted">Put this booker on your own page — two lines, no account:</p>
+        <pre className="snippet">
+          <code>{snippet}</code>
+        </pre>
       </section>
 
       <section className="features">

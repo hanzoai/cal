@@ -19,6 +19,9 @@ importers:
       '@hanzo/booker':
         specifier: ^0.1.0
         version: 0.1.0(hanzogui@7.0.0(expo@57.0.8)(react-dom@18.3.1(react@18.3.1))(react-native-web@0.20.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@18.3.12)(react@18.3.1))(react@18.3.1)(sf-symbols-typescript@2.2.0))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@18.3.12)(react@18.3.1))(react@18.3.1)
+      '@hanzo/event':
+        specifier: ^0.3.21
+        version: 0.3.21(react@18.3.1)
       '@hanzo/gui':
         specifier: 7.3.0
         version: 7.3.0(expo@57.0.8)(react-dom@18.3.1(react@18.3.1))(react-native-web@0.20.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@18.3.12)(react@18.3.1))(react@18.3.1)(sf-symbols-typescript@2.2.0)
@@ -770,6 +773,14 @@ packages:
       react-native: '*'
     peerDependenciesMeta:
       react-native:
+        optional: true
+
+  '@hanzo/event@0.3.21':
+    resolution: {integrity: sha512-gUEql7ZteyNIkxdX9G44plCNYMNppdU3K9s9uc3IBtwdMjCS6iRM7Z7EP9aOtZm8LqPnAJU9l7IRYYFKhG9cRQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
         optional: true
 
   '@hanzo/gui@7.3.0':
@@ -2026,10 +2037,12 @@ packages:
   '@xmldom/xmldom@0.8.13':
     resolution: {integrity: sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   '@xmldom/xmldom@0.9.10':
     resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
     engines: {node: '>=14.6'}
+    deprecated: this version has critical issues, please update to the latest version
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -4543,6 +4556,10 @@ snapshots:
       react: 18.3.1
     optionalDependencies:
       react-native: 0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@18.3.12)(react@18.3.1)
+
+  '@hanzo/event@0.3.21(react@18.3.1)':
+    optionalDependencies:
+      react: 18.3.1
 
   '@hanzo/gui@7.3.0(expo@57.0.8)(react-dom@18.3.1(react@18.3.1))(react-native-web@0.20.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@18.3.12)(react@18.3.1))(react@18.3.1)(sf-symbols-typescript@2.2.0)':
     dependencies:
@@ -8403,7 +8420,9 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-color@2.1.0': {}
 
