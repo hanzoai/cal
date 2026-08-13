@@ -22,8 +22,11 @@ export interface Target {
 const PREFIX = "pk_";
 
 // Handles and slugs are URL segments. Anything else in a decoded key is junk
-// from a mistyped host page, not a calendar we could ever resolve.
-const SEGMENT = /^[\w.-]{1,64}$/;
+// from a mistyped host page, not a calendar we could ever resolve. Dots are
+// legal in a name but a segment of nothing else is `.` or `..` — a step through
+// a path, not a name — and these two go on to be spliced into the public-config
+// URL the Booker fetches.
+const SEGMENT = /^(?!\.+$)[\w.-]{1,64}$/;
 
 /** mint returns the key that names a target. */
 export function mint(t: Target): string {
