@@ -1,23 +1,18 @@
-# Build the image and push it. Nothing else.
+# Build the image, prove it pulls, and pin it. This is the whole lane.
 #
-# REWRITTEN 2026-07-27. The previous version could not work on this fleet, in two
-# independent ways, and produced no image for weeks while looking merely idle:
+# The number universe pins is DERIVED, never a sha: a CR that names a commit
+# cannot be read as "which release is live", and pin.sh in universe refuses a
+# sha outright — so a sha-only build (what this used to be) produced images no
+# reviewed pin could ever consume. imgver gives the one number every builder on
+# this fleet uses: max(declared app/package.json, published ghcr) + a patch.
 #
-#   1. `buildctl-daemonless.sh: command not found` (exit 127). Jobs here run in
-#      catthehacker/ubuntu:act-24.04 (see GIT_RUNNER_LABELS on the git-runner
-#      StatefulSet) and that image has no buildctl. It also read
-#      `secrets.GIT_CLONE_TOKEN`, which exists on neither the repo nor the org.
-#   2. The `kubectl patch app` step failed with `kubectl: command not found` for
-#      the same reason — and it was futile regardless: cd.hanzo.ai's selfHeal
-#      restores the App CR from the pin in hanzoai/universe on its next poll.
-#      Rollout is a reviewed tag pin there, never a CI side effect.
+# cal's tag carries a leading v — its git tags and its ghcr tags are v0.2.x, and
+# pin.sh honours whatever convention the values file already holds. So imgver's
+# bare number gets a v at the two places a human reads it (the image tag and the
+# git tag); universe's pin.sh re-adds it from cal-web.yaml's own spelling.
 #
-# So the deploy step is gone on purpose. CI's job is to make a tag EXIST;
-# choosing which tag runs is a reviewed change in universe.
-#
-# This is the shape proven on hanzoai/playground, whose build job is the only
-# one of these that has ever gone green on this fleet. GHCR_USER / GHCR_TOKEN /
-# GH_PAT all exist as hanzoai org secrets on git.hanzo.ai.
+# The pin is cal-web, NOT cal: values/hanzo/cal.yaml is the booking BACKEND on a
+# different image and is frozen by a ratchet. cal-web.yaml is this web image.
 name: deploy
 on:
   push:
@@ -28,22 +23,46 @@ concurrency:
   group: deploy-cal-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
-    # Must name a label a runner ACTUALLY advertises. The four online
-    # git-runners offer hanzo-build-linux-amd64; a label nothing offers does not
-    # fail, it queues until the 24h timeout — silence, not an error.
+    # Must name a label a runner ACTUALLY advertises. The git-runners offer
+    # hanzo-build-linux-amd64; a label nothing offers does not fail, it queues
+    # until the 24h timeout — silence, not an error.
     runs-on: [hanzo-build-linux-amd64]
     steps:
+      # Full history + tags: this job TAGS the release, so it needs the tag
+      # namespace to push into and a non-shallow clone to describe from.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
+      # One implementation (hanzoai/ci bin/imgver), every builder. cal declares
+      # its floor in app/, so the published tag at ghcr carries the series.
+      - id: ver
+        uses: hanzoai/ci/.github/actions/imgver@v1
+        with: { repo: ghcr.io/hanzoai/cal }
+        env: { GH_PAT: '${{ secrets.GH_PAT }}' }
+
+      # Stamp before the build so the tree that gets tagged is byte-identical to
+      # the tree that was built. cal's version lives in app/, not the repo root.
+      - name: Stamp app/package.json with the release version
+        run: |
+          set -euo pipefail
+          v="${{ steps.ver.outputs.version }}"
+          sed -i.bak -E "s/(\"version\"[[:space:]]*:[[:space:]]*\")[^\"]+(\")/\1${v}\2/" app/package.json && rm -f app/package.json.bak
+          echo "app/package.json -> $(grep -m1 '\"version\"' app/package.json)"
+
+      # Kept alongside the semver, for forensics only. Nothing pins it.
       - id: meta
         run: echo "tag=sha-$(echo "$GITHUB_SHA" | cut -c1-7)" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker-container
-          driver-opts: network=host
+        with: { driver: docker-container, driver-opts: network=host }
 
       # Without this the push is unauthenticated and 403s at the registry.
       - uses: docker/login-action@v3
@@ -59,20 +78,95 @@ jobs:
           platforms: linux/amd64
           push: true
           provenance: false
-          tags: ghcr.io/hanzoai/cal:${{ steps.meta.outputs.tag }}
+          tags: |
+            ghcr.io/hanzoai/cal:v${{ steps.ver.outputs.version }}
+            ghcr.io/hanzoai/cal:${{ steps.meta.outputs.tag }}
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GH_PAT }}
 
       # build-push-action can exit 0 before the manifest resolves, so a green run
-      # could still mean a future ImagePullBackOff. Prove it pulls.
+      # could still mean a future ImagePullBackOff. Prove it pulls BEFORE the pin
+      # moves — pinning an image the registry cannot serve has no rollback path.
       - name: Verify the pushed image resolves
         run: |
           set -euo pipefail
-          img="ghcr.io/hanzoai/cal:${{ steps.meta.outputs.tag }}"
+          img="ghcr.io/hanzoai/cal:v${{ steps.ver.outputs.version }}"
           for i in 1 2 3 4 5 6; do
-            if docker buildx imagetools inspect "$img" >/dev/null 2>&1; then
-              echo "resolved $img"; exit 0
-            fi
+            docker buildx imagetools inspect "$img" >/dev/null 2>&1 && { echo "resolved $img"; exit 0; }
             sleep 5
           done
           echo "::error::pushed image never resolved: $img"; exit 1
+
+      # THE STEP THAT SHIPS. Everything above publishes an image; cd.hanzo.ai
+      # reconciles from universe's values files and never reads the registry, so
+      # an image nothing points at is just bytes in ghcr. pin.sh resolves tag AND
+      # digest from ONE lookup and writes them together, so the pod cannot report
+      # a new version while serving old bytes.
+      - name: Ship it
+        env:
+          KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
+          KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
+          KMS_ENDPOINT: ${{ vars.KMS_ENDPOINT || 'https://api.hanzo.ai' }}
+          KMS_SECRET_ENV: ${{ vars.KMS_SECRET_ENV || 'prod' }}
+          # pin.sh probes the registry before it moves anything; these let it read
+          # cal's private manifest instead of falling back to anonymous.
+          GHCR_USER: ${{ secrets.GHCR_USER }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+
+          # Secrets come from KMS, never from a file or a repo variable. The org
+          # is carried by the credential, not by the path.
+          KMS_TOKEN=$(curl -fsS "${KMS_ENDPOINT}/v1/kms/auth/login" \
+            -H 'Content-Type: application/json' \
+            -d "{\"clientId\":\"${KMS_CLIENT_ID}\",\"clientSecret\":\"${KMS_CLIENT_SECRET}\"}" \
+            | jq -r '.accessToken // empty')
+          [ -n "$KMS_TOKEN" ] || { echo "::error::KMS login failed at ${KMS_ENDPOINT} — image v${VERSION} is pushed but NOT deployed"; exit 1; }
+
+          PIN_TOKEN=$(curl -fsS \
+            "${KMS_ENDPOINT}/v1/kms/secrets/deploy/UNIVERSE_PIN_TOKEN?env=${KMS_SECRET_ENV}" \
+            -H "Authorization: Bearer ${KMS_TOKEN}" | jq -r '.value // empty')
+          [ -n "$PIN_TOKEN" ] || { echo "::error::UNIVERSE_PIN_TOKEN missing in KMS (path deploy, env ${KMS_SECRET_ENV}) — image v${VERSION} is pushed but NOT deployed"; exit 1; }
+          echo "::add-mask::${PIN_TOKEN}"
+
+          # cd reads THIS copy. universe also exists under hanzoai/ and is a
+          # different, staler commit — pinning there deploys nothing, silently.
+          git clone --quiet --depth 1 \
+            "https://x-access-token:${PIN_TOKEN}@git.hanzo.ai/hanzo/universe" /tmp/universe
+
+          # Another service can land its own pin between our clone and our push.
+          # A shallow clone has no common history to rebase onto, so RE-APPLY
+          # rather than merge: pinning is idempotent and derives everything from
+          # the file it finds, so the retry re-checks the monotonic guard too.
+          for attempt in 1 2 3 4 5; do
+            /tmp/universe/charts/app/pin.sh cal-web "$VERSION"
+
+            if git -C /tmp/universe push --quiet origin HEAD:main 2>/dev/null; then
+              echo "pinned cal-web to v${VERSION} — cd.hanzo.ai rolls it out"; exit 0
+            fi
+
+            echo "universe moved under us (attempt ${attempt}/5) — re-applying on the new tip"
+            git -C /tmp/universe fetch --quiet --depth 1 origin main
+            git -C /tmp/universe reset --hard --quiet FETCH_HEAD
+          done
+          echo "::error::image v${VERSION} shipped but the pin never landed — cal is published and unreachable"; exit 1
+
+      # ONLY after the image is proven pullable and pinned, so a git tag can never
+      # name a version the registry lacks. Bookkeeping is last so it cannot
+      # un-ship a good build. universe pins the image, not this tag.
+      - name: Tag the version this image ships
+        run: |
+          set -euo pipefail
+          v="${{ steps.ver.outputs.version }}"
+          git config user.name 'hanzo-ci'
+          git config user.email 'ci@hanzo.ai'
+          # Idempotent: a run that shipped its image and then died leaves the tag
+          # already there, and `git tag` on an existing name is fatal.
+          if git rev-parse -q --verify "refs/tags/v${v}" >/dev/null; then
+            echo "tag v${v} already exists"
+          else
+            git tag "v${v}"
+            git push origin "v${v}"
+          fi
+          echo "v${v} tagged"
