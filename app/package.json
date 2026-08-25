@@ -10,16 +10,15 @@
     "preview": "vite preview --host --port 3000"
   },
   "dependencies": {
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-router-dom": "6.28.0",
     "@hanzo/booker": "^0.1.0",
     "@hanzo/event": "^0.3.21",
-    "@hanzogui/config": "7.3.0",
-    "react-native-web": "^0.20.0",
+    "@hanzo/font": "^1.8.11",
     "@hanzo/gui": "7.3.0",
-    "@fontsource-variable/geist": "^5.0.0",
-    "@fontsource-variable/geist-mono": "^5.0.0"
+    "@hanzogui/config": "7.3.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native-web": "^0.20.0",
+    "react-router-dom": "6.28.0"
   },
   "devDependencies": {
     "@types/react": "18.3.12",

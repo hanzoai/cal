@@ -8,9 +8,9 @@
   --accent: #ededed;
   --on: #ededed;
   --off: #8a8a8a;
-  --sans: "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --sans: 'Zen', -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
-  --mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo,
+  --mono: 'Zen Mono', ui-monospace, "SF Mono", Menlo,
     Consolas, monospace;
 }
 

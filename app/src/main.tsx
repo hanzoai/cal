@@ -1,5 +1,4 @@
-import "@fontsource-variable/geist";
-import "@fontsource-variable/geist-mono";
+import "@hanzo/font/css";
 
 import { AnalyticsProvider } from "@hanzo/event/react";
 import { GuiProvider } from "hanzogui";
