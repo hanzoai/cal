@@ -1,13 +1,20 @@
 # cal.hanzo.ai — the Booker SPA over Hanzo Base /v1/calendar.
 #
-# Gate only. The image for this repo is built and pushed by the native builder
-# already in this repo (.hanzo/workflows/deploy.yml → ghcr.io/hanzoai/cal:<sha>);
-# declaring `images:` here would push a second, differently-tagged copy of the
-# same commit. What was missing is the assertion, so that is what this adds:
-# the workspace installs against the committed lockfile and every package builds.
+# One gate and one lane. The gate installs against the committed lockfile and
+# builds; the site lane publishes app/dist to the Sites plane slug `cal-web`,
+# which universe serves at cal.hanzo.ai (static-sites.yaml, cal-hanzo-ai-static)
+# beside /v1/calendar on the Base backend. There is no image: nothing in the
+# cluster runs this SPA.
 test:
   - name: build
     run: |
       set -euo pipefail
+      corepack enable
       pnpm install --frozen-lockfile
       pnpm build
+
+site:
+  slug: cal-web
+  dir: app/dist
+  build: corepack enable && pnpm install --frozen-lockfile && pnpm build
+  on: [main]

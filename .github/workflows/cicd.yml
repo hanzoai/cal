@@ -1,0 +1,19 @@
+name: CI/CD
+
+# The caller and nothing else: hanzo.yml says how this repo gates and ships,
+# and hanzoai/ci reads it. The hanzoai org's runners serve github.com, so this
+# is the plane that builds cal.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cicd:
+    uses: hanzoai/ci/.github/workflows/build.yml@v1
+    secrets: inherit

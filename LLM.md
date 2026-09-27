@@ -8,27 +8,27 @@ booking is created in Base.
 - `app` — the Vite + React SPA (`@hanzo/cal-app`). Routes: `/` landing,
   `/{owner}/{slug}` the Booker, `/booking/{uid}` confirmation + cancel, `/embed`
   the framed Booker a third-party page loads.
-- `Dockerfile` — self-contained multi-stage: stage 1 builds the Vite bundle with
-  the pinned pnpm; stage 2 is `FROM ghcr.io/hanzoai/spa` and copies the bundle to
-  `/public` (SPA fallback). A fresh `docker build .` needs no pre-built `app/dist`
-  (it is gitignored), so CI and local builds are identical.
-- `.hanzo/workflows/deploy.yml` — native CI on the self-hosted pool
-  `hanzo-build-linux-amd64`; builds and pushes `ghcr.io/hanzoai/cal:sha-<short>`.
-  It never deploys: the rollout is a reviewed tag pin on the `cal` App CR in
-  `hanzoai/universe`, and cd.hanzo.ai's selfHeal would undo anything CI patched.
+- `hanzo.yml` — the gate (frozen install + build) and the site lane, which
+  publishes `app/dist` to the Sites plane slug `cal-web`. universe serves that
+  prefix at cal.hanzo.ai (`cal-hanzo-ai-static`) with the response headers in
+  `cal-hanzo-ai-headers`, and routes `/v1/calendar` to the Base backend. The
+  caller is `.github/workflows/cicd.yml`. There is no image.
 - `deploy/mirror-to-forge.sh` — server-side mirror-IN resync (idempotent).
 
 ## The UI package
 `@hanzo/booker` (published from `hanzoai/gui/pkgs/calendar`) — a universal
-(web + native) Booker built on hanzogui primitives, pinned at `^0.1.0`. It is
-NOT Cal's atoms; it re-implements the flow and speaks Cal's API-v2 shapes.
+(web + native) Booker built on hanzogui primitives, at `^8.3.6` on `@hanzo/gui`
+8.3.5 and React 19. It is NOT Cal's atoms; it re-implements the flow and speaks
+Cal's API-v2 shapes. 8.3.6 added `prefill`, the name, email and notes the
+details step starts with.
 
-Two build facts follow from it and are easy to trip over:
-- `@hanzo/booker` imports its peer under the name `hanzogui`. Vite aliases that
-  to `@hanzo/gui`; `app/tsconfig.json` repeats the alias in `paths`, or the type
-  checker cannot resolve it. Change one, change both.
-- Do not chase `@hanzo/booker@8.x`: it peer-requires `@hanzo/gui >= 8`, and the
-  app is pinned to the 7.3.0 line. 8.1.1 adds no props 0.1.0 lacks.
+- `/{owner}/{slug}?name=&email=&notes=` fills the details step, as a Cal.com
+  link does; hanzo.ai's sales page sends its visitors here that way. The page
+  reads the three once and takes them off the address before anything reports
+  it, because `@hanzo/event` stamps the URL on every event.
+- The app's own `gui.ts` and `main.tsx` import `hanzogui`, which Vite aliases to
+  `@hanzo/gui`; `app/tsconfig.json` repeats the alias in `paths`. Change one,
+  change both.
 
 ## Backend contract
 `app/src/api.ts` resolves the base (`VITE_CAL_API`, default `/v1/calendar`), and
@@ -69,18 +69,10 @@ and cancels the booking, so it never leaves the booking page.
   full-viewport overlay with no script at all; the bar is drawn in the loader's
   own DOM under `all:initial !important`, which a scriptless injection cannot
   remove, and it says whose dialog it is.
-- `ALLOW_FRAMING=true` is set in the Dockerfile because `ghcr.io/hanzoai/spa`
-  otherwise sends `X-Frame-Options: DENY` + `frame-ancestors 'none'` and the
-  embed silently refuses to render. **It also means cal serves no CSP at all.**
-  That server sets the header only on the branch where framing is refused, so
-  with framing allowed the whole policy is dropped on every path — measured
-  against `sha-b9d3a13`: no CSP and no X-Frame-Options on `/` or `/booking/x`.
-  The value is spelled `SPA_CSP`, the name the server actually reads
-  (`HANZO_STATIC_CSP` was read by nothing), and it ships the day that image sets
-  the header unconditionally and lets framing pick `frame-ancestors` instead of
-  picking whether there is a policy at all. `SPA_*` is also the runtime-config
-  namespace there, so the value is additionally templated into a public
-  `/config.json` — public either way, but worth knowing.
+- Framing is decided by the edge now, not by this repo: the Sites plane
+  answers with universe's `cal-hanzo-ai-headers`, which today send
+  `X-Frame-Options: DENY`, so a third-party page cannot frame `/embed` until
+  that middleware lets it.
 - Framing reaches `/booking/<uid>` too, since the allowance is per-server. The
   uid is the capability that reads the attendee and cancels the meeting, so
   cancelling takes two clicks, and `Keep it` is the one that sits where the first
@@ -136,6 +128,6 @@ from `useBooker`'s `selectSlot` / `submit` / the failed-submit branch — not a
 fork of the UI here and not a wrapper around `fetch`.
 
 ## Homing
-Canonical origin is the forge, `git.hanzo.ai/hanzoai/cal`, which is also the CI
-executor. (The repo is `cal`, not `calendar`, because `hanzoai/calendar` is a
+GitHub (`github.com/hanzoai/cal`) is home and builds it; the forge copy is a
+mirror. (The repo is `cal`, not `calendar`, because `hanzoai/calendar` is a
 full fork of `calcom/cal.diy` — a different artifact.)
