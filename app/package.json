@@ -10,11 +10,15 @@
     "preview": "vite preview --host --port 3000"
   },
   "dependencies": {
-    "@hanzo/booker": "^8.3.6",
-    "@hanzo/event": "^0.3.21",
+    "@hanzo/appearance": "0.2.7",
+    "@hanzo/booker": "^8.3.7",
+    "@hanzo/event": "^0.3.57",
     "@hanzo/font": "^1.8.11",
     "@hanzo/gui": "8.3.5",
+    "@hanzo/ui": "^8.27.89",
+    "@hanzogui/animations-css": "8.3.5",
     "@hanzogui/config": "8.3.5",
+    "@hanzogui/telemetry": "8.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-native-web": "^0.21.2",

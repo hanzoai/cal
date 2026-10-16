@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { calendarApi } from "../api";
 import { booked, useShown } from "../analytics";
+import { Page } from "../Page";
 
 /** The query names a link may fill the details step with, as a Cal.com link does. */
 const PREFILL = ["name", "email", "notes"] as const;
@@ -36,15 +37,17 @@ export function Booking() {
   useShown("page", target);
 
   return (
-    <Booker
-      host={owner}
-      eventSlug={slug}
-      apiUrl={calendarApi}
-      prefill={prefill}
-      onBooked={(booking) => {
-        booked("page", target);
-        if (booking?.uid) navigate(`/booking/${booking.uid}`);
-      }}
-    />
+    <Page>
+      <Booker
+        host={owner}
+        eventSlug={slug}
+        apiUrl={calendarApi}
+        prefill={prefill}
+        onBooked={(booking) => {
+          booked("page", target);
+          if (booking?.uid) navigate(`/booking/${booking.uid}`);
+        }}
+      />
+    </Page>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { calendarApi } from "../api";
 import { booked, useShown } from "../analytics";
+import { Page } from "../Page";
 
 // The team calendar for booking time with Hanzo
 const TEAM = { host: "hanzo", eventSlug: "intro" };
@@ -14,27 +15,16 @@ export function Home() {
   useShown("page", TEAM);
 
   return (
-    <main className="landing">
-      <header className="nav">
-        <span className="brand">
-          <img className="brand-mark" src="/logo.svg" alt="" width={22} height={22} />
-          Hanzo
-        </span>
-      </header>
-
-      <section className="booker-stage">
-        <div className="booker-frame">
-          <Booker
-            host={TEAM.host}
-            eventSlug={TEAM.eventSlug}
-            apiUrl={calendarApi}
-            onBooked={(booking) => {
-              booked("page", TEAM);
-              if (booking?.uid) navigate(`/booking/${booking.uid}`);
-            }}
-          />
-        </div>
-      </section>
-    </main>
+    <Page>
+      <Booker
+        host={TEAM.host}
+        eventSlug={TEAM.eventSlug}
+        apiUrl={calendarApi}
+        onBooked={(booking) => {
+          booked("page", TEAM);
+          if (booking?.uid) navigate(`/booking/${booking.uid}`);
+        }}
+      />
+    </Page>
   );
 }

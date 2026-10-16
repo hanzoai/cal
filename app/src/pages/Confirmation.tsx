@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { calendarApi } from "../api";
+import { Page } from "../Page";
 
 type Booking = {
   uid: string;
@@ -59,20 +60,20 @@ export function Confirmation() {
 
   if (error) {
     return (
-      <main className="shell">
+      <Page>
         <div className="card">
           <p className="muted">{error}</p>
         </div>
-      </main>
+      </Page>
     );
   }
   if (!booking) {
     return (
-      <main className="shell">
+      <Page>
         <div className="card">
           <p className="muted">Loading…</p>
         </div>
-      </main>
+      </Page>
     );
   }
 
@@ -81,7 +82,7 @@ export function Confirmation() {
   const attendee = booking.attendees?.[0];
 
   return (
-    <main className="shell">
+    <Page>
       <div className="card">
         <div className={`badge ${canceled ? "badge-off" : "badge-on"}`}>
           {canceled ? "Canceled" : "Confirmed"}
@@ -122,6 +123,6 @@ export function Confirmation() {
           </button>
         )}
       </div>
-    </main>
+    </Page>
   );
 }

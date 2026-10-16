@@ -6,9 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    // @hanzo/booker imports its peer under the name `hanzogui`, which the Vite
-    // build aliases to @hanzo/gui. Say the same thing to the type checker.
-    "paths": { "hanzogui": ["./node_modules/@hanzo/gui"] },
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

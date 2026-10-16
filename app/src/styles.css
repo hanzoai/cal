@@ -1,21 +1,18 @@
+/* cal.hanzo.ai on @hanzo/ui's tokens (`@hanzo/ui/styles.css`, imported first in
+   main.tsx). Nothing here restates a colour design already publishes; it names
+   the page ground and lays out the one card.
+
+   The ground is the checkout's: black in dark, white in light. Design's own
+   ground is a rung off each (#0a0a0a, #f7f7f7), and hanzo.ai and its checkout
+   paint the pure ends, so this page does too. Fields sit on `--muted` (#171717 /
+   #ededed) under the `--border` hairline, which is #2e2e2e / #d5d5d5 over them. */
 :root {
-  /* Dark monochrome. */
-  --bg: #0a0a0a;
-  --card: #141414;
-  --ink: #ededed;
-  --muted: #8a8a8a;
-  --line: #262626;
-  --accent: #ededed;
-  --on: #ededed;
-  --off: #8a8a8a;
-  --sans: 'Zen', -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
-  --mono: 'Zen Mono', ui-monospace, "SF Mono", Menlo,
-    Consolas, monospace;
+  --background: #000000;
 }
 
-* {
-  box-sizing: border-box;
+:root.light,
+:root.t_light {
+  --background: #ffffff;
 }
 
 html,
@@ -26,50 +23,85 @@ body,
 }
 
 body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--sans);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-code,
-.hero-note code,
-.foot code {
-  font-family: var(--mono);
+/* ── The page: the mark, then the one card ─────────────────────────────────── */
+.page {
+  max-width: 908px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
 }
 
-/* The shell hosts our own light pages (landing, confirmation). The Booker itself
-   ships Cal's Tailwind styling and renders inside its own wrapper. */
-.shell {
+.nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 24px;
+  padding: 8px 0 24px;
 }
 
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: block;
+}
+
+/* The mark is drawn white; on the light ground it is drawn black. */
+:root.light .brand-mark,
+:root.t_light .brand-mark {
+  filter: invert(1);
+}
+
+@media (min-width: 640px) {
+  .page {
+    padding: 24px 24px 64px;
+  }
+  .nav {
+    padding: 12px 0 40px;
+  }
+}
+
+/* ── The booking page (/booking/:uid) ──────────────────────────────────────── */
 .card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 32px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
   max-width: 480px;
-  width: 100%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 32px;
+  }
 }
 
 .card h1 {
-  font-size: 22px;
-  margin: 8px 0 6px;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  margin: 12px 0 6px;
 }
 
 .muted {
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: 14px;
+  margin: 0;
 }
 
 .when {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   margin: 4px 0;
 }
@@ -80,51 +112,59 @@ code,
   word-break: break-word;
 }
 
-code {
-  background: var(--card);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 13px;
-}
-
 .badge {
   display: inline-block;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
-  margin-bottom: 8px;
+  background: var(--muted);
+  border: 1px solid var(--border);
 }
 
 .badge-on {
-  background: var(--card);
-  border: 1px solid var(--line);
-  color: var(--on);
+  color: var(--foreground);
 }
 
 .badge-off {
-  background: var(--card);
-  border: 1px solid var(--line);
-  color: var(--off);
+  color: var(--muted-foreground);
+}
+
+/* Two kinds of control and no third: the one answer the page prefers is the
+   white pill (black in light), and everything else is quiet. */
+.keep,
+.cancel {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.keep {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--primary);
+}
+
+.keep:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .cancel {
   margin-top: 20px;
   background: transparent;
-  color: var(--off);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
 }
 
 .cancel:hover {
-  border-color: var(--off);
+  color: var(--foreground);
 }
 
+.keep:disabled,
 .cancel:disabled {
   opacity: 0.6;
   cursor: default;
@@ -140,233 +180,27 @@ code {
 
 /* Keeping the booking is the answer this page prefers, so it looks like one and
    the destructive answer is the quiet one below it. */
-.keep {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.keep:hover {
-  border-color: var(--ink);
-}
-
 .confirm .cancel {
   margin-top: 0;
   border: 0;
-  padding: 4px 8px;
+  padding: 6px 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0b0d;
-    --card: #151517;
-    --ink: #f3f4f6;
-    --muted: #9ca3af;
-    --line: #26262b;
-  }
-  code {
-    background: #26262b;
-  }
+/* ── Framed in someone else's page ─────────────────────────────────────────── */
+/* Paint no ground of our own; the booker's card carries its own. The scheme
+   script stamps `color-scheme` on <html>, and a frame whose color-scheme
+   differs from its host's is given an opaque backdrop by the browser, which
+   would paint a dark slab around the card on a light page. The frame keeps
+   the host's default, so it stays see-through. */
+html.framed {
+  color-scheme: normal !important;
 }
 
-/* ── Hanzo Calendar marketing landing (cal.hanzo.ai/) ───────────────────── */
-.landing {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px;
-}
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 4px 40px;
-}
-.brand {
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-}
-.brand-mark {
-  display: block;
-}
-.nav-links {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-}
-.nav-link {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-}
-.nav-link:hover {
-  color: var(--ink);
-}
-.nav-cta {
-  color: #0a0a0a;
-  background: var(--accent);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 8px 16px;
-}
-.nav-cta:hover {
-  opacity: 0.9;
-}
-
-/* The product itself — the live Booker — framed as the hero centerpiece. */
-.booker-stage {
-  display: flex;
-  justify-content: center;
-  padding: 8px 0 56px;
-}
-.booker-frame {
-  width: 100%;
-  max-width: 720px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 12px;
-  overflow: hidden;
-}
-.hero {
-  text-align: center;
-  padding: 44px 0 24px;
-}
-.hero h1 {
-  font-size: clamp(32px, 6vw, 56px);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  margin: 0 0 20px;
-}
-.lede {
-  font-size: 19px;
-  line-height: 1.55;
-  color: var(--muted);
-  max-width: 620px;
-  margin: 0 auto 32px;
-}
-.hero-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.btn {
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
-  border-radius: 10px;
-  padding: 13px 22px;
-  border: 1px solid transparent;
-  transition: transform 0.05s ease;
-}
-.btn:active {
-  transform: translateY(1px);
-}
-.btn-primary {
-  background: var(--accent);
-  color: #0a0a0a;
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--ink);
-  border-color: var(--line);
-}
-.hero-note {
-  margin-top: 26px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.hero-note code,
-.foot code {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 2px 7px;
-  font-size: 12px;
-}
-.features {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin: 24px 0 56px;
-}
-@media (max-width: 640px) {
-  .features {
-    grid-template-columns: 1fr;
-  }
-}
-.feature {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 24px;
-}
-.feature h3 {
-  margin: 0 0 8px;
-  font-size: 17px;
-  letter-spacing: -0.01em;
-}
-.feature p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14.5px;
-  line-height: 1.55;
-}
-.foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid var(--line);
-  padding: 24px 4px;
-  font-size: 13px;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* The copy-paste embed snippet under the landing booker. */
-.embed-hint {
-  margin: 0 0 56px;
-  text-align: center;
-}
-.embed-hint .muted {
-  margin: 0 0 12px;
-  font-size: 14px;
-}
-.snippet {
-  margin: 0;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 16px 18px;
-  overflow-x: auto;
-  text-align: left;
-  font-size: 12.5px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-
-/* Framed in someone else's page: paint no background of our own, and give the
-   booker the whole document. */
 html.framed,
 html.framed body {
   background: transparent;
 }
+
 .embed {
   padding: 0;
 }
-
-/* FORCE GEIST — Tamagui/hanzogui set font-family inline, so override it. */
-#root, #root * { font-family: var(--sans) !important; }
-code, .hero-note code, .foot code { font-family: var(--mono) !important; }

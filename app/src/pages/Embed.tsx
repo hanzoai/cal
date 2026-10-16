@@ -16,7 +16,6 @@ export function Embed() {
   const target = resolve(pk);
   const parent = loader(params.get("parent"));
 
-  useTransparentPage();
   usePostedHeight(parent);
   useEscapeToClose(parent);
   useShown(surface, target);
@@ -31,23 +30,16 @@ export function Embed() {
 
   return (
     <main className="embed">
+      {/* The popup's panel is already the card, so the Booker draws none. */}
       <Booker
         host={target.host}
         eventSlug={target.eventSlug}
         apiUrl={calendarApi}
+        bare={surface === "popup"}
         onBooked={() => booked(surface, target)}
       />
     </main>
   );
-}
-
-// An embedded document paints no background of its own, so the booker sits on
-// whatever the host page already has.
-function useTransparentPage() {
-  useEffect(() => {
-    document.documentElement.classList.add("framed");
-    return () => document.documentElement.classList.remove("framed");
-  }, []);
 }
 
 // The address of every message back to the page around us: embed.js names its

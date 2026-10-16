@@ -47,7 +47,6 @@ const PANEL: Style = {
   "max-height": "760px",
   "border-radius": "12px",
   overflow: "hidden",
-  "background-color": "#0b0b0d",
 };
 const BAR: Style = {
   display: "flex",
@@ -58,18 +57,14 @@ const BAR: Style = {
   "font-family": "system-ui, -apple-system, sans-serif",
   "font-size": "13px",
   "line-height": "1.2",
-  color: "#f3f4f6",
-  "background-color": "#0b0b0d",
 };
 const LABEL: Style = {
   "font-family": "system-ui, -apple-system, sans-serif",
   "font-size": "13px",
-  color: "#9ca3af",
 };
 const DISMISS: Style = {
   "font-family": "system-ui, -apple-system, sans-serif",
   "font-size": "13px",
-  color: "#f3f4f6",
   background: "transparent",
   border: "0",
   padding: "2px 6px",
@@ -134,19 +129,20 @@ export function mount(el: Element): void {
  *  overlay is cal.hanzo.ai's, not the page's. */
 export function open(pk: string): void {
   close();
+  const ink = scheme();
   const root = document.createElement("div");
   apply(root, SCRIM);
 
   const panel = document.createElement("div");
-  apply(panel, PANEL);
+  apply(panel, { ...PANEL, "background-color": ink.ground });
 
   const bar = document.createElement("div");
-  apply(bar, BAR);
+  apply(bar, { ...BAR, color: ink.text, "background-color": ink.ground });
   const who = document.createElement("span");
-  apply(who, LABEL);
+  apply(who, { ...LABEL, color: ink.quiet });
   who.textContent = new URL(origin).host;
   const dismiss = document.createElement("button");
-  apply(dismiss, DISMISS);
+  apply(dismiss, { ...DISMISS, color: ink.text });
   dismiss.textContent = "Close";
   dismiss.addEventListener("click", () => close());
   bar.append(who, dismiss);
@@ -160,6 +156,16 @@ export function open(pk: string): void {
   document.body.appendChild(root);
   document.addEventListener("keydown", onKey);
   scrim = root;
+}
+
+/** The popup's ground and ink. The booker inside the frame follows the
+ *  device's light or dark, and this reads the same device, so the panel around
+ *  it agrees with it: the checkout's black or white, and its two inks. */
+function scheme(): { ground: string; text: string; quiet: string } {
+  const light = typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: light)").matches;
+  return light
+    ? { ground: "#ffffff", text: "#0a0a0a", quiet: "#525252" }
+    : { ground: "#000000", text: "#ededed", quiet: "#a3a3a3" };
 }
 
 /** close dismisses the popup. */
