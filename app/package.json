@@ -15,7 +15,7 @@
     "@hanzo/event": "^0.3.57",
     "@hanzo/font": "^1.8.11",
     "@hanzo/gui": "8.3.5",
-    "@hanzo/ui": "^8.27.89",
+    "@hanzo/ui": "^8.27.91",
     "@hanzogui/animations-css": "8.3.5",
     "@hanzogui/config": "8.3.5",
     "@hanzogui/telemetry": "8.3.5",

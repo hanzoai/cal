@@ -26,8 +26,8 @@ importers:
         specifier: 8.3.5
         version: 8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)
       '@hanzo/ui':
-        specifier: ^8.27.89
-        version: 8.27.89(bo3p4ypxyuvr73h5p2f6vyzt54)
+        specifier: ^8.27.91
+        version: 8.27.91(bo3p4ypxyuvr73h5p2f6vyzt54)
       '@hanzogui/animations-css':
         specifier: 8.3.5
         version: 8.3.5(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -682,14 +682,14 @@ packages:
       react:
         optional: true
 
-  '@hanzo/ui@8.27.89':
-    resolution: {integrity: sha512-S5gxELV/Tp2pm81SQUD6YXTcyB+o7GufbJdsi5iVZjIHs+/KRwljR6cqaxd+pjTO99d+VeP7Yb2iPIJVbtE7Jg==}
+  '@hanzo/ui@8.27.91':
+    resolution: {integrity: sha512-tZAXYvLAzliPMt9jMlTbLPVbQ+AKHdFK01Zl1O0qi0aweNhMawI5DilssF7us3Bgye06Mv40gmN6NrF3r6aBYQ==}
     peerDependencies:
       '@hanzo/canvas': '>=0.2.3'
       '@hanzo/cd': '>=0.1.2'
       '@hanzo/dashboard': '>=0.2.0'
       '@hanzo/data': '>=1.2.4'
-      '@hanzo/event': '>=0.3.52'
+      '@hanzo/event': '>=0.3.58'
       '@hanzo/gui': ^8.3.5
       '@hanzo/iam': '>=0.21.26'
       '@hanzo/pay': '>=0.1.1'
@@ -713,8 +713,6 @@ packages:
       '@hanzo/cd':
         optional: true
       '@hanzo/dashboard':
-        optional: true
-      '@hanzo/event':
         optional: true
       '@hanzo/iam':
         optional: true
@@ -3674,7 +3672,7 @@ snapshots:
       '@hanzogui/lucide-icons-2': 8.3.5(react-dom@19.2.8(react@19.2.8))(react-native-svg@15.16.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react@19.2.8)
       react: 19.2.8
 
-  '@hanzo/ui@8.27.89(bo3p4ypxyuvr73h5p2f6vyzt54)':
+  '@hanzo/ui@8.27.91(bo3p4ypxyuvr73h5p2f6vyzt54)':
     dependencies:
       '@codemirror/commands': 6.11.1
       '@codemirror/lang-json': 6.0.2
@@ -3685,6 +3683,7 @@ snapshots:
       '@hanzo/brand': 1.4.8(react@19.2.8)
       '@hanzo/data': 1.2.4(@hanzo/gui@8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react-native-svg@15.16.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react@19.2.8)
       '@hanzo/design': 0.5.35
+      '@hanzo/event': 0.3.57(react@19.2.8)
       '@hanzo/font': 1.9.2(next@16.3.6(@babel/core@7.29.7)(@types/node@26.1.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))
       '@hanzo/gui': 8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)
       '@hanzo/logo': 1.0.26(react@19.2.8)
@@ -3702,7 +3701,6 @@ snapshots:
       react-native-svg: 15.16.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)
       react-native-web: 0.21.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     optionalDependencies:
-      '@hanzo/event': 0.3.57(react@19.2.8)
       next: 16.3.6(@babel/core@7.29.7)(@types/node@26.1.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     transitivePeerDependencies:
       - encoding
