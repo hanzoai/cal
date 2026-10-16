@@ -89,6 +89,7 @@ body {
 }
 
 .card h1 {
+  outline: none;
   font-size: 21px;
   letter-spacing: -0.02em;
   margin: 12px 0 6px;

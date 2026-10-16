@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { calendarApi } from "../api";
@@ -31,6 +31,14 @@ export function Confirmation() {
   const [error, setError] = useState("");
   const [canceling, setCanceling] = useState(false);
   const [confirming, setConfirming] = useState(false);
+
+  // A booking lands here by navigation from the Booker, which leaves the
+  // keyboard on nothing; the title takes focus, so the next Tab is this page's
+  // and a screen reader announces where it is.
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (booking) title.current?.focus();
+  }, [booking?.uid]);
 
   useEffect(() => {
     fetch(`${calendarApi}/bookings/${encodeURIComponent(uid)}`)
@@ -87,7 +95,9 @@ export function Confirmation() {
         <div className={`badge ${canceled ? "badge-off" : "badge-on"}`}>
           {canceled ? "Canceled" : "Confirmed"}
         </div>
-        <h1>{booking.title}</h1>
+        <h1 ref={title} tabIndex={-1}>
+          {booking.title}
+        </h1>
         <p className="when">
           {when.toLocaleString(undefined, {
             weekday: "long",

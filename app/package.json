@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@hanzo/appearance": "0.2.7",
-    "@hanzo/booker": "^8.3.7",
+    "@hanzo/booker": "^8.3.8",
     "@hanzo/event": "^0.3.57",
     "@hanzo/font": "^1.8.11",
     "@hanzo/gui": "8.3.5",

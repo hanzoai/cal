@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { calendarApi } from "../api";
 import { booked, useShown } from "../analytics";
 import { Page } from "../Page";
+import { hostName } from "../team";
 
 /** The query names a link may fill the details step with, as a Cal.com link does. */
 const PREFILL = ["name", "email", "notes"] as const;
@@ -41,6 +42,7 @@ export function Booking() {
       <Booker
         host={owner}
         eventSlug={slug}
+        hostName={hostName(owner)}
         apiUrl={calendarApi}
         prefill={prefill}
         onBooked={(booking) => {

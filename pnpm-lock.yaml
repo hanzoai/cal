@@ -14,8 +14,8 @@ importers:
         specifier: 0.2.7
         version: 0.2.7(react@19.2.8)
       '@hanzo/booker':
-        specifier: ^8.3.7
-        version: 8.3.7(@hanzo/gui@8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)
+        specifier: ^8.3.8
+        version: 8.3.8(@hanzo/gui@8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)
       '@hanzo/event':
         specifier: ^0.3.57
         version: 0.3.57(react@19.2.8)
@@ -584,8 +584,8 @@ packages:
     peerDependencies:
       react: '>=19.2.8'
 
-  '@hanzo/booker@8.3.7':
-    resolution: {integrity: sha512-y5m+n8uAtCnTfoa2LO2QRLvv1U/cGa/s3a2624+bWxKPL3b8Vnfp4psgMXp/jdVEDxHberPidKl3jWuzTO9lqg==}
+  '@hanzo/booker@8.3.8':
+    resolution: {integrity: sha512-5czexhXdEbSC0vvCl/v4K8d4PjqWReK61FydYhjiMTvwd3CPpXK4TQpgkIpMSNSshKN5n4updRtcQHVeTz3uFA==}
     peerDependencies:
       '@hanzo/gui': '>=8.3.1'
       react: '>=19.2.8'
@@ -3537,7 +3537,7 @@ snapshots:
       '@hanzo/design': 0.5.33
       react: 19.2.8
 
-  '@hanzo/booker@8.3.7(@hanzo/gui@8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)':
+  '@hanzo/booker@8.3.8(@hanzo/gui@8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@hanzo/gui': 8.3.5(react-dom@19.2.8(react@19.2.8))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.2.8))(react@19.2.8)
       react: 19.2.8

@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { calendarApi } from "../api";
 import { booked, useShown, type Surface } from "../analytics";
 import { resolve } from "../pk";
+import { hostName } from "../team";
 
 // The document a host page frames: the same <Booker> against the same
 // /v1/calendar backend, with nothing else on the page. The publishable key in
@@ -34,6 +35,7 @@ export function Embed() {
       <Booker
         host={target.host}
         eventSlug={target.eventSlug}
+        hostName={hostName(target.host)}
         apiUrl={calendarApi}
         bare={surface === "popup"}
         onBooked={() => booked(surface, target)}

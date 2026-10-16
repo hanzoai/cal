@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { calendarApi } from "../api";
 import { booked, useShown } from "../analytics";
 import { Page } from "../Page";
-
-// The team calendar for booking time with Hanzo
-const TEAM = { host: "hanzo", eventSlug: "intro" };
+import { TEAM } from "../team";
 
 // Clean booking page — no marketing, just direct scheduling with the team
 export function Home() {
@@ -19,6 +17,7 @@ export function Home() {
       <Booker
         host={TEAM.host}
         eventSlug={TEAM.eventSlug}
+        hostName={TEAM.name}
         apiUrl={calendarApi}
         onBooked={(booking) => {
           booked("page", TEAM);
